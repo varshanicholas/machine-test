@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Travel Requests</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Navbar (reuse from the previous page) -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Travel Request</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="request_form.html">Form</a>
+                </li>
+                
+                <li class="nav-item">
+                    <!-- Logout button styled as a primary button -->
+                    <button class="btn btn-danger ms-2" onclick="logout()">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Container for travel requests table -->
+<div class="container mt-4">
+    <h2>Submitted Travel Requests</h2>
+    <table class="table table-striped" id="requestTable">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Destination</th>
+                <th>Priority</th>
+                <th>View Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be injected here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap Modal for viewing details -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Travel Request Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Employee Name:</strong> <span id="modalEmpName"></span></p>
+        <p><strong>Destination:</strong> <span id="modalDestination"></span></p>
+        <p><strong>Cause of Travel:</strong> <span id="modalCause"></span></p>
+        <p><strong>From Date:</strong> <span id="modalFromDate"></span></p>
+        <p><strong>Arrival Date:</strong> <span id="modalArrivalDate"></span></p>
+        <p><strong>Number of Days:</strong> <span id="modalNoOfDays"></span></p>
+        <p><strong>Priority:</strong> <span id="modalPriority"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="viewDetails.js"></script> <!-- Link to the new JS file -->
+<script>
+    // Existing code to populate the table
+    document.addEventListener('DOMContentLoaded', function() {
+        const requestTableBody = document.querySelector('#requestTable tbody');
+        
+        // Get the travel requests from local storage
+        let requests = JSON.parse(localStorage.getItem('travelRequests')) || [];
+
+        // Function to render the table based on requests
+        function renderTable() {
+            requestTableBody.innerHTML = ''; // Clear existing rows
+            if (requests.length === 0) {
+                requestTableBody.innerHTML = '<tr><td colspan="4">No travel requests found.</td></tr>';
+            } else {
+                requests.forEach((request, index) => {
+                    const row = `
+                        <tr>
+                            <td>${request.empName}</td>
+                            <td>${request.destination}</td>
+                            <td>${request.priority}</td>
+                            <td><button class="btn btn-sm btn-info" onclick="viewDetails(${index})">View more</button></td>
+                        </tr>
+                    `;
+                    requestTableBody.innerHTML += row;
+                });
+            }
+        }
+
+        // Initial render of all requests
+        renderTable();
+    });
+
+
+
+    // Function to handle logout
+    function logout() {
+        // Clear user data or redirect to the login page
+        localStorage.clear();
+        window.location.href = 'login.html'; // Redirect to login page
+    }
+</script>
+
+
+</body>
+
+
+
+<script>
+    // Function to view more details (parameterized modal)
+    function viewDetails(index) {
+        let requests = JSON.parse(localStorage.getItem('travelRequests')) || [];
+        const request = requests[index];
+    
+        // Populate the modal content dynamically
+        document.getElementById('modalEmpName').textContent = request.empName;
+        document.getElementById('modalDestination').textContent = request.destination;
+        document.getElementById('modalCause').textContent = request.cause;
+        document.getElementById('modalFromDate').textContent = request.fromDate;
+        document.getElementById('modalArrivalDate').textContent = request.arrivalDate;
+        document.getElementById('modalNoOfDays').textContent = request.noOfDays;
+        document.getElementById('modalPriority').textContent = request.priority;
+    
+        // Show the modal
+        const myModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        myModal.show();
+    }
+    </script>
+</html>
+

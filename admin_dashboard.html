@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Travel Requests</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">ADMIN DASHBOARD </a>
+        
+                <li class="nav-item">
+                    <!-- Logout button styled as a primary button -->
+                    <button class="btn btn-danger ms-2" onclick="logout()">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<!-- Container for travel requests table -->
+<div class="container mt-4">
+    <h2>Submitted Travel Requests</h2>
+    <table class="table table-striped" id="requestTable">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Destination</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Number of Days</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be injected here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const requestTableBody = document.querySelector('#requestTable tbody');
+        
+        // Sample data (can be fetched from backend or local storage)
+        let requests = JSON.parse(localStorage.getItem('travelRequests')) || [
+            {
+                empName: 'John Doe',
+                destination: 'Paris',
+                fromDate: '2024-09-14',
+                arrivalDate: '2024-09-20',
+                noOfDays: 6,
+                priority: 'High',
+                status: 'Pending'
+            },
+            {
+                empName: 'Jane Smith',
+                destination: 'London',
+                fromDate: '2024-09-10',
+                arrivalDate: '2024-09-15',
+                noOfDays: 5,
+                priority: 'Medium',
+                status: 'Pending'
+            }
+        ];
+
+        // Function to render the table
+        function renderTable() {
+            requestTableBody.innerHTML = ''; // Clear existing rows
+            requests.forEach((request, index) => {
+                const row = `
+                    <tr>
+                        <td>${request.empName}</td>
+                        <td>${request.destination}</td>
+                        <td>${request.fromDate}</td>
+                        <td>${request.arrivalDate}</td>
+                        <td>${request.noOfDays}</td>
+                        <td>${request.priority}</td>
+                        <td><span id="status-${index}" class="badge bg-warning">${request.status}</span></td>
+                        <td>
+                            <select class="form-select form-select-sm" onchange="updateStatus(${index}, this)">
+                                <option value="Pending" ${request.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Approved" ${request.status === 'Approved' ? 'selected' : ''}>Approve</option>
+                                <option value="Rejected" ${request.status === 'Rejected' ? 'selected' : ''}>Reject</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+                requestTableBody.innerHTML += row;
+            });
+        }
+
+    // Function to handle logout
+    function logout() {
+        // Clear user data or redirect to the login page
+        localStorage.clear();
+        window.location.href = 'login.html'; // Redirect to login page
+    }
+        // Function to update the status of a request
+        window.updateStatus = function(index, selectElement) {
+            const status = selectElement.value; // Get the selected value from the dropdown
+            requests[index].status = status; // Update the request's status
+            document.getElementById(`status-${index}`).textContent = status; // Update the status in the table cell
+            document.getElementById(`status-${index}`).className = `badge bg-${status === 'Approved' ? 'success' : status === 'Rejected' ? 'danger' : 'warning'}`; // Update the badge class
+            localStorage.setItem('travelRequests', JSON.stringify(requests)); // Save updated data
+        }
+
+        // Initial table render
+        renderTable();
+    });
+</script>
+
+</body>
+</html>
